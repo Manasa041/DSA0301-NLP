@@ -1,0 +1,41 @@
+import nltk
+from nltk.corpus import wordnet
+from nltk.tokenize import word_tokenize
+
+nltk.download('punkt')
+nltk.download('wordnet')
+
+# Sample sentence with an ambiguous word
+sentence = "The bank by the river is very steep."
+
+# Tokenize the sentence
+tokens = word_tokenize(sentence)
+
+# Create a function for word sense disambiguation
+def disambiguate_word(word, context):
+    senses = wordnet.synsets(word)
+    if not senses:
+        return None
+
+    best_sense = None
+    max_overlap = 0
+
+    context = set(context)
+
+    for sense in senses:
+        sense_definition = word_tokenize(sense.definition())
+        overlap = len(context.intersection(sense_definition))
+        if overlap > max_overlap:
+            max_overlap = overlap
+            best_sense = sense
+
+    return best_sense
+
+# Perform word sense disambiguation for a target word
+target_word = "bank"
+sense = disambiguate_word(target_word, tokens)
+
+if sense:
+    print(f"The most likely sense of '{target_word}' in the context is: {sense.definition()}")
+else:
+    print(f"No sense found for '{target_word}' in the WordNet database.")
